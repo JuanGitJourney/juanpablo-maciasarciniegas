@@ -72,12 +72,18 @@ export class LandingPage {
 
   /**
    * Initiates the sign-up process by clicking the main sign-up button.
-   * This might navigate to a sign-up page or open a sign-up modal.
+   * This might navigate to a sign-up page.
    */
   public async navigateToSignUpPage(): Promise<void> {
-    await this._clickElement(this.signUpButton, 'Sign Up');
+    await this._clickElement(this.signUpButton, 'Sign Up', 1000);
   }
 
-  // Add more methods for other actions or verifications on the home page:
-  // e.g., getTotalBudgetAmount(), getRecentTransactions(), navigateToProfile(), etc.
+  /**
+   * Initiates the login process by clicking the main login button.
+   * This might navigate to a log in page.
+   */
+  public async navigateLoginPage(): Promise<void> {
+    await this._clickElement(this.loginButton, 'Login');
+  }
+
 }

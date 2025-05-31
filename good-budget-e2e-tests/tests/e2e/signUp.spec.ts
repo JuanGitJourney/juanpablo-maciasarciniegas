@@ -2,7 +2,6 @@ import { test, Page, expect } from '@playwright/test';
 import { SignUpPage } from '../../pages/signUp.page';
 import { HomePage } from '../../pages/home.page';
 import { LandingPage } from '../../pages/landing.page';
-import { sign } from 'crypto';
 
 const BASE_URL = 'https://www.goodbudget.com';
 
@@ -11,21 +10,13 @@ test.describe('Signup Flow E2E Tests', () => {
   let signUpPage: SignUpPage;
   let homePage: HomePage;
 
-  let page: Page;
-
-  test.beforeAll(async ({ browser }) => {
-    page = await browser.newPage();
+  test.beforeEach(async ({ page }) => {
+    // Fresh page instance for each test - ensures test isolation
+    landingPage = new LandingPage(page);
     signUpPage = new SignUpPage(page);
     homePage = new HomePage(page);
-    landingPage = new LandingPage(page);
-  });
-
-  test.beforeEach(async () => {
+    
     await page.goto(BASE_URL);
-  });
-
-  test.afterAll(async () => {
-    await page.close();
   });
 
   test('Navigate to Signup Page', async () => {
@@ -33,17 +24,11 @@ test.describe('Signup Flow E2E Tests', () => {
     await landingPage.checkUrl(/.*goodbudget.com\/signup/, 'Sign Up');
   });
 
-  test('Form Field Validations', async () => {
-    const invalidEmail = 'invalid-email';
-    const invalidPassword = '123';
+  test('Empty Email and Password Validation', async () => {
     const emptyEmail = '';
     const emptyPassword = '';
-    const userEmail = `testuser_${Date.now()}@example.com`;
-    const userPassword = 'defaultPassword123';
 
     await landingPage.navigateToSignUpPage();
-
-    // --- Case 1: Empty email and password ---
     await signUpPage.provideSignUpDetails(emptyEmail, emptyPassword, {
       clickPlanRadio: true,
       acceptTerms: true,
@@ -62,8 +47,13 @@ test.describe('Signup Flow E2E Tests', () => {
 
     expect(emptyEmailError).toBe(true);
     expect(emptyPasswordError).toBe(true);
+  });
 
-    // --- Case 2: Invalid email & weak password ---
+  test('Invalid Email and Weak Password Validation', async () => {
+    const invalidEmail = 'invalid-email';
+    const invalidPassword = '123';
+
+    await landingPage.navigateToSignUpPage();
     await signUpPage.provideSignUpDetails(invalidEmail, invalidPassword, {
       clickPlanRadio: true,
       acceptTerms: true,
@@ -82,10 +72,13 @@ test.describe('Signup Flow E2E Tests', () => {
 
     expect(invalidEmailError).toBe(true);
     expect(weakPasswordError).toBe(true);
+  });
 
-    
-    // --- Case 3: Unselected Plan ---
-    await page.reload(); // Reset form state
+  test('Unselected Plan Validation', async () => {
+    const userEmail = `testuser_${Date.now()}@example.com`;
+    const userPassword = 'defaultPassword123';
+
+    await landingPage.navigateToSignUpPage();
     await signUpPage.provideSignUpDetails(userEmail, userPassword, {
       clickPlanRadio: false,
       acceptTerms: false,
@@ -93,9 +86,19 @@ test.describe('Signup Flow E2E Tests', () => {
       pauseForCaptcha: false,
     });
 
+    // Add validation check for unselected plan error
+    // const planError = await signUpPage.verifyValidationError(
+    //   signUpPage.planError,
+    //   'You must select a plan.'
+    // );
+    // expect(planError).toBe(true);
+  });
 
+  test('Terms of Use Not Accepted Validation', async () => {
+    const userEmail = `testuser_${Date.now()}@example.com`;
+    const userPassword = 'defaultPassword123';
 
-    // --- Case 4: Not Accept Terms of Use ---
+    await landingPage.navigateToSignUpPage();
     await signUpPage.provideSignUpDetails(userEmail, userPassword, {
       clickPlanRadio: true,
       acceptTerms: false,
@@ -105,11 +108,10 @@ test.describe('Signup Flow E2E Tests', () => {
 
     const notAgreeOnTermsError = await signUpPage.verifyValidationError(
       signUpPage.termsOfUseError,
-      `You must agree to the Terms of Use.`
+      'You must agree to the Terms of Use.'
     );
 
     expect(notAgreeOnTermsError).toBe(true);
-
   });
 
   test('Duplicate Account Handling', async () => {
@@ -121,16 +123,15 @@ test.describe('Signup Flow E2E Tests', () => {
       clickPlanRadio: true,
       acceptTerms: true,
       clickGetStarted: true,
-      pauseForCaptcha: false 
+      pauseForCaptcha: false
     });
-    
+
     const duplicateEmailError = await signUpPage.verifyValidationError(
       signUpPage.emailError,
       'Email is already taken. Already have a Household? Log in »'
     );
-    console.log(signUpPage.emailError); 
+    
     expect(duplicateEmailError).toBe(true);
-
   });
 
   test('Successful Signup', async () => {
@@ -145,7 +146,6 @@ test.describe('Signup Flow E2E Tests', () => {
       clickGetStarted: true,
       pauseForCaptcha: true 
     });
-    
 
     // Verify welcome modal or success page appears
     await homePage.verifyWelcomeModal();
@@ -153,5 +153,4 @@ test.describe('Signup Flow E2E Tests', () => {
     // Verify username displayed on home page
     await homePage.verifyUserName(userName);
   });
-
 });

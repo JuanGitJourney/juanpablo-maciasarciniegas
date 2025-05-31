@@ -36,9 +36,9 @@ export class SignUpPage extends LandingPage {
 
   // Methods to interact with the Home Page
   
-  private async _enterEmail(email: string): Promise<void> {
+  protected async _enterEmail(email: string, emailFieldLocator: Locator): Promise<void> {
     try {
-      await this.emailField.fill(email);
+      await emailFieldLocator.fill(email);
       console.log(`Email entered: ${email}`);
     } catch (error) {
       console.error(`Error entering email: ${error}`);
@@ -46,9 +46,9 @@ export class SignUpPage extends LandingPage {
     }
   }
 
-  private async _enterPassword(password: string): Promise<void> {
+  protected async _enterPassword(password: string, passwordFieldLocator: Locator): Promise<void> {
     try {
-      await this.passwordField.fill(password);
+      await passwordFieldLocator.fill(password);
       console.log(`Password entered: ${password}`);
     } catch (error) {
       console.error(`Error entering password: ${error}`);
@@ -56,7 +56,7 @@ export class SignUpPage extends LandingPage {
     }
   }
 
-  private async _verifValidationError(locator: Locator, expectedText: string): Promise<boolean> {
+  protected async _verifValidationError(locator: Locator, expectedText: string): Promise<boolean> {
     try {
       await expect(locator).toHaveText(expectedText, { timeout: 5000 });
       console.log(`✅ Validation error verified: ${expectedText}`);
@@ -90,8 +90,8 @@ export class SignUpPage extends LandingPage {
 
     await this.page.waitForLoadState('domcontentloaded'); // Ensure the page is fully loaded
 
-    await this._enterEmail(email);
-    await this._enterPassword(password);
+    await this._enterEmail(email, this.emailField);
+    await this._enterPassword(password, this.passwordField);
 
     if (clickPlanRadio) {
       await this._clickElement(this.planRadio, 'Select Free Plan');

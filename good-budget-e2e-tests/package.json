@@ -4,12 +4,14 @@
   "description": "E2E tests for Good Budget App",
   "scripts": {
     "test": "npx playwright test",
+    "test:signup": "npx playwright test ./tests/e2e/signup.spec.ts --headed",
+    "test:login": "npx playwright test ./tests/e2e/login.spec.ts --headed",
     "test:headed": "npx playwright test --headed",
     "test:ui": "npx playwright test --ui",
     "test:report": "npx playwright show-report",
     "test:all": "npx playwright test --all",
     "test:chrome": "npx playwright test --project=chromium",
-    "test:firefox": "npx playwright test --project=safari"
+    "test:safari": "npx playwright test --project=safari"
   },
   "keywords": [
     "playwright",

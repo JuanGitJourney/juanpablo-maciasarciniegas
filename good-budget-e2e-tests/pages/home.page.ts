@@ -10,6 +10,7 @@ export class HomePage extends LandingPage{
   readonly userpilotModal: Locator;
   readonly userpilotNextButton: Locator;
   readonly userName: Locator;
+  readonly logOutButton: Locator;
   
   // Constructor
   constructor(page: Page) {
@@ -20,6 +21,7 @@ export class HomePage extends LandingPage{
     this.userpilotModal = page.locator('.userpilot-slide-container[role="main"]');
     this.userpilotNextButton = this.userpilotModal.locator('#userpilot-next-button .userpilot-btn[userpilot-btn-action="flow"]');
     this.userName = page.locator('div[class="trans-title"] span[class="walkme-pii"]');
+    this.logOutButton = page.locator('//a[normalize-space()="Logout"]');
   }
   
   /**
@@ -51,8 +53,6 @@ export class HomePage extends LandingPage{
     }
   }
 
-
-
   async verifyUserName(name: string): Promise<void> {
     await expect(this.userName).toBeVisible();
 
@@ -65,7 +65,10 @@ export class HomePage extends LandingPage{
       throw error;
     }
   }
-  
+
+  async logOut(): Promise<void> {
+    await this._clickElement(this.logOutButton, 'Logout button');
+  }
 
 
   private async ensureModalAppears(): Promise<boolean> {
