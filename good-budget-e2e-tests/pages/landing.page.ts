@@ -1,8 +1,10 @@
 import { type Page, type Locator, expect } from '@playwright/test';
+import { createPageLogger, Logger } from '../utils/logger.util';
 
 export class LandingPage {
   // Properties
   readonly page: Page; // Instance of the Playwright Page
+  protected readonly logger: Logger;
 
   // Locators for elements on the Home Page
   readonly loginButton: Locator;
@@ -11,6 +13,7 @@ export class LandingPage {
   // Constructor
   constructor(page: Page) {
     this.page = page;
+    this.logger = createPageLogger('LandingPage');
 
     // Locators initialization
     this.loginButton = page.locator("(//a[@class='elementor-item'][normalize-space()='Log in'])[1]");
@@ -26,12 +29,16 @@ export class LandingPage {
    * @param timeout Optional timeout for waiting for the button to be visible. Defaults to 5000ms.
    */
   protected async _clickElement(elementLocator: Locator, elementName: string, timeout: number = 5000): Promise<void> {
+    this.logger.actionStart(`Click ${elementName}`, { timeout });
+    
     try {
       await elementLocator.waitFor({ state: 'visible', timeout });
       await elementLocator.click();
-      console.log(`${elementName} button clicked successfully.`);
+      this.logger.actionSuccess(`Click ${elementName}`);
+      this.logger.elementInteraction('Click', elementName);
     } catch (error) {
-      console.error(`Error clicking ${elementName} button: ${error}`);
+      this.logger.actionFailure(`Click ${elementName}`, error as Error, { timeout });
+      
       // Improved error re-throwing to preserve stack trace and original error type if possible
       if (error instanceof Error) {
         const clickError = new Error(`Failed to click ${elementName} button. Underlying error: ${error.message}`);
@@ -50,12 +57,21 @@ export class LandingPage {
    * @param timeout Optional timeout for the URL check. Defaults to 10000ms.
    */
   protected async _checkUrl(expectedUrlPattern: RegExp | string, pageName: string, timeout: number = 10000): Promise<void> {
+    this.logger.actionStart(`Check URL for ${pageName}`, { expectedPattern: expectedUrlPattern.toString(), timeout });
+    
     try {
       await expect(this.page).toHaveURL(expectedUrlPattern, { timeout });
-      console.log(`Successfully navigated to ${pageName} page. URL matches: ${expectedUrlPattern.toString()}`);
+      const currentUrl = this.page.url();
+      this.logger.actionSuccess(`Check URL for ${pageName}`, { expectedPattern: expectedUrlPattern.toString(), actualUrl: currentUrl });
+      this.logger.assertion(`URL matches pattern for ${pageName}`, true, expectedUrlPattern.toString(), currentUrl);
     } catch (error) {
       const currentUrl = this.page.url();
-      console.error(`Error navigating to ${pageName} page. Expected URL pattern: ${expectedUrlPattern.toString()}, Actual URL: ${currentUrl}. Error: ${error}`);
+      this.logger.actionFailure(`Check URL for ${pageName}`, `URL pattern mismatch`, { 
+        expectedPattern: expectedUrlPattern.toString(), 
+        actualUrl: currentUrl 
+      });
+      this.logger.assertion(`URL matches pattern for ${pageName}`, false, expectedUrlPattern.toString(), currentUrl);
+      
       if (error instanceof Error) {
         const urlError = new Error(`Failed to verify URL for ${pageName} page. Expected pattern: ${expectedUrlPattern.toString()}, Actual URL: ${currentUrl}. Underlying error: ${error.message}`);
         urlError.stack = error.stack;
@@ -75,6 +91,7 @@ export class LandingPage {
    * This might navigate to a sign-up page.
    */
   public async navigateToSignUpPage(): Promise<void> {
+    this.logger.step('Navigate to Sign Up page');
     await this._clickElement(this.signUpButton, 'Sign Up', 1000);
   }
 
@@ -83,7 +100,7 @@ export class LandingPage {
    * This might navigate to a log in page.
    */
   public async navigateLoginPage(): Promise<void> {
+    this.logger.step('Navigate to Login page');
     await this._clickElement(this.loginButton, 'Login');
   }
-
 }
