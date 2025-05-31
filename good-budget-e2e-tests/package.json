@@ -1,0 +1,29 @@
+{
+  "name": "good-budget-e2e-tests",
+  "version": "1.0.0",
+  "description": "E2E tests for Good Budget App",
+  "scripts": {
+    "test": "npx playwright test",
+    "test:headed": "npx playwright test --headed",
+    "test:ui": "npx playwright test --ui",
+    "test:report": "npx playwright show-report",
+    "test:all": "npx playwright test --all",
+    "test:chrome": "npx playwright test --project=chromium",
+    "test:firefox": "npx playwright test --project=safari"
+  },
+  "keywords": [
+    "playwright",
+    "e2e",
+    "testing",
+    "good-budget"
+  ],
+  "author": "Juan Pablo Macias",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.52.0",
+    "@types/node": "^22.15.29"
+  },
+  "dependencies": {
+    "dotenv": "^16.5.0"
+  }
+}
