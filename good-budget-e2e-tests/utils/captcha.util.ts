@@ -1,5 +1,8 @@
 import { Page } from '@playwright/test';
 
+// This utility function attempts to bypass reCAPTCHA checkboxes on GoodBudget login/signup pages.
+// As of now it is not used in any tests because it is not the right approach to handle reCAPTCHA.
+
 /**
  * Attempts to interact with reCAPTCHA checkbox if it appears.
  */
