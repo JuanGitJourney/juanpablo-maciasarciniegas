@@ -66,13 +66,16 @@ export class LandingPage {
     }
   }
 
+  public async checkUrl(expectedUrl: RegExp, pageTitle: string) {
+    return this._checkUrl(expectedUrl, pageTitle);
+  }
+
   /**
    * Initiates the sign-up process by clicking the main sign-up button.
    * This might navigate to a sign-up page or open a sign-up modal.
    */
-  async navigateToSignUpPage(): Promise<void> {
+  public async navigateToSignUpPage(): Promise<void> {
     await this._clickElement(this.signUpButton, 'Sign Up');
-    await this._checkUrl(/.*goodbudget.com\/signup/, 'Sign Up');
   }
 
   // Add more methods for other actions or verifications on the home page:

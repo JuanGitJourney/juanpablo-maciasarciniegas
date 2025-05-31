@@ -14,6 +14,9 @@ export class SignUpPage extends LandingPage {
   readonly planRadio: Locator;
   readonly termsOfUseCheckbox: Locator;
   readonly getStartedButton: Locator;
+  readonly emailError: Locator;
+  readonly passwordError: Locator;
+  readonly termsOfUseError: Locator;
  
   // Constructor
   constructor(page: Page) {
@@ -26,6 +29,9 @@ export class SignUpPage extends LandingPage {
     this.planRadio = page.locator('#new_household_plan_0');
     this.termsOfUseCheckbox = page.locator('#new_household_terms_of_use');
     this.getStartedButton = page.locator('//span[@class="elementor-button-text"]');
+    this.emailError = page.locator('.elementor-field-group-email label.error');
+    this.passwordError = page.locator('.elementor-field-group-password label.error');
+    this.termsOfUseError = page.locator('label.checkbox > label.error');
   }
 
   // Methods to interact with the Home Page
@@ -40,7 +46,7 @@ export class SignUpPage extends LandingPage {
     }
   }
 
-    private async _enterPassword(password: string): Promise<void> {
+  private async _enterPassword(password: string): Promise<void> {
     try {
       await this.passwordField.fill(password);
       console.log(`Password entered: ${password}`);
@@ -50,29 +56,59 @@ export class SignUpPage extends LandingPage {
     }
   }
 
-
-  /**
-   * Initiates the sign-up process by clicking the main sign-up button.
-   * This might navigate to a sign-up page or open a sign-up modal.
-   */
-  async navigateToSignUpPage(): Promise<void> {
-    await this._clickElement(this.signUpButton, 'Sign Up');
-    await this._checkUrl(/.*goodbudget.com\/signup/, 'Sign Up');
+  private async _verifValidationError(locator: Locator, expectedText: string): Promise<boolean> {
+    try {
+      await expect(locator).toHaveText(expectedText, { timeout: 5000 });
+      console.log(`✅ Validation error verified: ${expectedText}`);
+      return true;
+    } catch (error) {
+      console.warn(`⚠️ Validation error not found or text mismatch: ${expectedText}`);
+      return false;
+    }
   }
 
-  async provideSignUpDetails(email: string, password: string): Promise<void> {
-    await this.page.waitForLoadState('domcontentloaded'); // Ensure the page is fully loaded before interacting
+   public async verifyValidationError(locator: Locator, expectedText: string): Promise<boolean> {
+    return this._verifValidationError(locator, expectedText);
+  }
+
+  async provideSignUpDetails(
+    email: string,
+    password: string,
+    options?: {
+      clickPlanRadio?: boolean;
+      acceptTerms?: boolean;
+      clickGetStarted?: boolean;
+      pauseForCaptcha?: boolean;
+    }
+  ): Promise<void> {
+    const {
+      clickPlanRadio = true,
+      acceptTerms = true,
+      clickGetStarted = true,
+      pauseForCaptcha = true,
+    } = options || {};
+
+    await this.page.waitForLoadState('domcontentloaded'); // Ensure the page is fully loaded
+
     await this._enterEmail(email);
     await this._enterPassword(password);
-    await this._clickElement(this.planRadio, 'Select Free Plan');
-    await this._clickElement(this.termsOfUseCheckbox, 'Accept Terms of Use');
-    
-    console.log(">>> Pausing for manual CAPTCHA completion. Please solve the CAPTCHA and submit the form in the browser, then resume the test via Playwright Inspector. <<<");
-    await this.page.pause();
-    console.log(">>> Resuming test. Assuming CAPTCHA was solved and signup submitted. <<<");
 
-    await this._clickElement(this.getStartedButton, 'Get Started Button');
+    if (clickPlanRadio) {
+      await this._clickElement(this.planRadio, 'Select Free Plan');
+    }
 
+    if (acceptTerms) {
+      await this._clickElement(this.termsOfUseCheckbox, 'Accept Terms of Use');
+    }
+
+    if (pauseForCaptcha) {
+      console.log(">>> Pausing for manual CAPTCHA completion. Please solve the CAPTCHA and submit the form in the browser, then resume the test via Playwright Inspector. <<<");
+      await this.page.pause();
+      console.log(">>> Resuming test. Assuming CAPTCHA was solved and signup submitted. <<<");
+    }
+
+    if (clickGetStarted) {
+      await this._clickElement(this.getStartedButton, 'Get Started Button');
+    }
   }
-  
 }
