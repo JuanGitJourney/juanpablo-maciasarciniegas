@@ -16,9 +16,7 @@ COPY . .
 RUN npx playwright install --with-deps
 
 # Set environment variables (can be overridden at runtime)
-ENV BASE_URL = 'https://www.goodbudget.com'
-ENV GOODBUDGET_VALID_EMAIL="existinguser@example.com"
-ENV GOODBUDGET_VALID_PASSWORD="defaultPassword123"
+ENV BASE_URL='https://www.goodbudget.com'
 
 # Default command to run all tests
 CMD ["npm", "test"]

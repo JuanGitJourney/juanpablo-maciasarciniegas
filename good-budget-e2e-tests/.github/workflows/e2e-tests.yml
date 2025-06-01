@@ -1,0 +1,30 @@
+name: E2E Tests (Docker)
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        run: docker build -t good-budget-e2e .
+
+      - name: Run login tests
+        run: |
+          docker run --rm -it --env DOCKER=true good-budget-e2e npm run test:login
+
+      - name: Run envelope tests
+        run: |
+          docker run --rm -it --env DOCKER=true good-budget-e2e npm run test:envelope
+
+
