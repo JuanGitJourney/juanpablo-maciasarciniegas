@@ -4,9 +4,9 @@
   "description": "E2E tests for Good Budget App",
   "scripts": {
     "test": "npx playwright test",
-    "test:signup": "npx playwright test ./tests/e2e/signup.spec.ts --headed",
-    "test:login": "npx playwright test ./tests/e2e/login.spec.ts --headed",
-    "test:envelope": "npx playwright test ./tests/e2e/envelope.spec.ts --headed",
+    "test:signup": "npx playwright test ./tests/e2e/signup.spec.ts",
+    "test:login": "npx playwright test ./tests/e2e/login.spec.ts",
+    "test:envelope": "npx playwright test ./tests/e2e/envelope.spec.ts",
     "test:headed": "npx playwright test --headed",
     "test:ui": "npx playwright test --ui",
     "test:report": "npx playwright show-report",
