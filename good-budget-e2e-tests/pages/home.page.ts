@@ -12,6 +12,11 @@ export class HomePage extends LandingPage {
   readonly userpilotNextButton: Locator;
   readonly userName: Locator;
   readonly logOutButton: Locator;
+  readonly addEnvelopeButton: Locator;
+  readonly existingEnvelopeName: Locator
+  readonly existingEnvelopeBudget: Locator;
+  readonly newEnvelopeName: Locator;
+  readonly newEnvelopeBudget: Locator;
   
   // Constructor
   constructor(page: Page) {
@@ -24,7 +29,11 @@ export class HomePage extends LandingPage {
     this.userpilotNextButton = this.userpilotModal.locator('#userpilot-next-button .userpilot-btn[userpilot-btn-action="flow"]');
     this.userName = page.locator('div[class="trans-title"] span[class="walkme-pii"]');
     this.logOutButton = page.locator('//a[normalize-space()="Logout"]');
-
+    this.addEnvelopeButton = page.locator('a[href="https://goodbudget.com/envelope/edit"]');
+    this.existingEnvelopeName = page.locator("(//span[@class='env-left text-truncate flex-shrink-1 flex-grow'])[1]");
+    this.existingEnvelopeBudget = page.locator("(//em[contains(text(),'240.00')])[1]");
+    this.newEnvelopeName = page.locator("(//span[@class='env-left text-truncate flex-shrink-1 flex-grow'])[3]");
+    this.newEnvelopeBudget = page.locator("(//em[contains(text(),'100.00')])[2]");
     this.logger.info('HomePage initialized');
   }
   
@@ -99,6 +108,60 @@ export class HomePage extends LandingPage {
       this.logger.actionSuccess('Log Out');
     } catch (error) {
       this.logger.actionFailure('Log Out', error as Error);
+      throw error;
+    }
+  }
+
+  /**
+    * Clicks the 'Add Envelope' button on the home page.
+  */
+  async clickAddEnvelopeButton(): Promise<void> {
+    this.logger.actionStart('Attempting to click the Add Envelope button.');
+    try{    
+      await this._clickElement(this.addEnvelopeButton, 'Add Envelope Button');
+      this.logger.actionSuccess('Click Add Envelope Button');
+    } catch (error) {     
+      this.logger.actionFailure('Click Add Envelope Button', error as Error);
+      throw new Error(`Failed to click Add Envelope button. Underlying error: ${error instanceof Error ? error.message : String(error)}`);
+    }
+ 
+  }
+
+
+  async verifyCreatedEnvelope(name: string, isNewEnvelope: boolean): Promise<void> {
+    this.logger.actionStart('Verify Created Envelope', { envelopeName: name });
+    try {
+      if (isNewEnvelope) {
+        await expect(this.newEnvelopeName).toContainText(name);
+        this.logger.assertion(`Envelope "${name}" is visible`, true);
+      } else {
+        await expect(this.existingEnvelopeName).toContainText(name);
+        this.logger.assertion(`Envelope "${name}" is visible`, true);
+      }
+
+      this.logger.actionSuccess('Verify Created Envelope', { envelopeName: name });
+    } catch (error) {
+      this.logger.assertion(`Envelope "${name}" is visible`, false);
+      this.logger.actionFailure('Verify Created Envelope', `Envelope "${name}" not found`, { envelopeName: name });
+      throw error;
+    }
+  }
+
+  async verifyDeletedEnvelope(name: string, isNewEnvelope: boolean): Promise<void> {
+    this.logger.actionStart('Verify Delete Envelope', { envelopeName: name });
+    try {
+      if (isNewEnvelope) {
+        await expect(this.newEnvelopeName).not.toContainText(name);
+        this.logger.assertion(`Envelope "${name}" is not visible`, true);
+      } else {
+        await expect(this.existingEnvelopeName).not.toContainText(name);
+        this.logger.assertion(`Envelope "${name}" is not visible`, true);
+      }
+      this.logger.assertion(`Envelope "${name}" is not visible`, true);
+      this.logger.actionSuccess('Verify Delete Envelope', { envelopeName: name });
+    } catch (error) {
+      this.logger.assertion(`Envelope "${name}" is not visible`, false);
+      this.logger.actionFailure('Verify Delete Envelope', `Envelope "${name}" still exists`, { envelopeName: name });
       throw error;
     }
   }

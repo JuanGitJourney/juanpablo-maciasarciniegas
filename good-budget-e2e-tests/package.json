@@ -6,6 +6,7 @@
     "test": "npx playwright test",
     "test:signup": "npx playwright test ./tests/e2e/signup.spec.ts --headed",
     "test:login": "npx playwright test ./tests/e2e/login.spec.ts --headed",
+    "test:envelope": "npx playwright test ./tests/e2e/envelope.spec.ts --headed",
     "test:headed": "npx playwright test --headed",
     "test:ui": "npx playwright test --ui",
     "test:report": "npx playwright show-report",

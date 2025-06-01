@@ -121,7 +121,7 @@ Below are the charters defined for this session
     - Description: System correctly prevents duplicate email registration
     - Evidence: Attempt to register with existing email shows appropriate error
 
-❌ Finding #9: Severe Email Validation Bypass  
+❌ Finding #9: Severe Email Validation Bypass on Signup 
   - Severity: HIGH (Security/Data Integrity Risk)
   - Description: Application accepts malformed email addresses that violate RFC standards
   - Malformed Emails Accepted:

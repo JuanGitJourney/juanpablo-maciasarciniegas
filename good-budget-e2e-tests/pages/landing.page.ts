@@ -50,6 +50,26 @@ export class LandingPage {
     }
   }
 
+  protected async _fillInputField(inputLocator: Locator, value: string, fieldName: string, timeout: number = 5000): Promise<void> {
+    this.logger.actionStart(`Fill input field ${fieldName}`, { value, timeout });
+    try {
+      await inputLocator.waitFor({ state: 'visible', timeout });
+      await inputLocator.fill(value);
+      this.logger.actionSuccess(`Fill input field ${fieldName}`, { value });
+      this.logger.elementInteraction('Fill', fieldName, value);
+    } catch (error) {
+      this.logger.actionFailure(`Fill input field ${fieldName}`, error as Error, { value, timeout });
+      // Improved error re-throwing to preserve stack trace and original error type if possible
+      if (error instanceof Error) {
+        const fillError = new Error(`Failed to fill input field ${fieldName}. Underlying error: ${error.message}`);
+        fillError.stack = error.stack; // Preserve original stack if available
+        throw fillError;
+      } else {
+        throw new Error(`Failed to fill input field ${fieldName}. Underlying error is of unknown type: ${String(error)}`);
+      }
+    }
+  }
+
   /**
    * Generic private method to check if the current URL matches an expected pattern.
    * @param expectedUrlPattern The RegExp or string pattern for the expected URL.

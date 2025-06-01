@@ -1,5 +1,5 @@
 import { test, Page, expect } from '@playwright/test';
-import { LoginPage } from '../../pages/login.page'; // Adjust path as needed
+import { LoginPage } from '../../pages/login.page';
 import { HomePage } from '../../pages/home.page';
 import { LandingPage } from '../../pages/landing.page';
 
@@ -21,12 +21,12 @@ test.describe('Login Flow E2E Tests', () => {
     await page.goto(BASE_URL);
   });
 
-  test('Navigate to Login Page', async () => {
+  test('TC001-L: Navigate to Login Page', async () => {
     await landingPage.navigateLoginPage();
     await loginPage.checkUrl(/.*goodbudget.com\/login/, 'Log In | Personal Budget Software | Goodbudget');
   });
 
-  test('Form Field Validations on Login Page', async () => {
+  test('TC002-L: Form Field Validations on Login Page', async () => {
     const invalidEmail = 'invalid-email';
     const nonExistentEmail = `nonexistent_${Date.now()}@example.com`;
     const incorrectPassword = 'wrongPassword123!';
@@ -73,7 +73,7 @@ test.describe('Login Flow E2E Tests', () => {
     expect(incorrectPasswordError).toBe(true);
   });
 
-  test('Successful Login', async () => {
+  test('TC003-L: Successful Login', async () => {
     await landingPage.navigateLoginPage();
     await loginPage.provideLoginDetails(VALID_EMAIL, VALID_PASSWORD, { clickLogin: true });
 
@@ -83,7 +83,7 @@ test.describe('Login Flow E2E Tests', () => {
     await homePage.verifyUserName(VALID_USERNAME); 
   });
 
-  test('Logout and Return to Landing Page', async () => {
+  test('TC004-L: Logout and Return to Landing Page', async () => {
     await landingPage.navigateLoginPage();
     await loginPage.provideLoginDetails(VALID_EMAIL, VALID_PASSWORD, { clickLogin: true });
     await homePage.logOut();

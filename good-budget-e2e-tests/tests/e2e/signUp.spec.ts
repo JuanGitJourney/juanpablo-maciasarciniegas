@@ -19,12 +19,12 @@ test.describe('Signup Flow E2E Tests', () => {
     await page.goto(BASE_URL);
   });
 
-  test('Navigate to Signup Page', async () => {
+  test('TC001-S: Navigate to Signup Page', async () => {
     await landingPage.navigateToSignUpPage();
     await landingPage.checkUrl(/.*goodbudget.com\/signup/, 'Sign Up');
   });
 
-  test('Empty Email and Password Validation', async () => {
+  test('TC002-S: Empty Email and Password Validation', async () => {
     const emptyEmail = '';
     const emptyPassword = '';
 
@@ -49,7 +49,7 @@ test.describe('Signup Flow E2E Tests', () => {
     expect(emptyPasswordError).toBe(true);
   });
 
-  test('Invalid Email and Weak Password Validation', async () => {
+  test('TC003-S: Invalid Email and Weak Password Validation', async () => {
     const invalidEmail = 'invalid-email';
     const invalidPassword = '123';
 
@@ -74,7 +74,7 @@ test.describe('Signup Flow E2E Tests', () => {
     expect(weakPasswordError).toBe(true);
   });
 
-  test('Unselected Plan Validation', async () => {
+  test('TC004-S: Unselected Plan Validation', async () => {
     const userEmail = `testuser_${Date.now()}@example.com`;
     const userPassword = 'defaultPassword123';
 
@@ -87,14 +87,14 @@ test.describe('Signup Flow E2E Tests', () => {
     });
 
     // Add validation check for unselected plan error
-    // const planError = await signUpPage.verifyValidationError(
-    //   signUpPage.planError,
-    //   'You must select a plan.'
-    // );
-    // expect(planError).toBe(true);
+    const planError = await signUpPage.verifyValidationError(
+      signUpPage.passwordError,
+      'You must select a plan.'
+    );
+    expect(planError).toBe(true);
   });
 
-  test('Terms of Use Not Accepted Validation', async () => {
+  test('TC005-S: Terms of Use Not Accepted Validation', async () => {
     const userEmail = `testuser_${Date.now()}@example.com`;
     const userPassword = 'defaultPassword123';
 
@@ -114,7 +114,7 @@ test.describe('Signup Flow E2E Tests', () => {
     expect(notAgreeOnTermsError).toBe(true);
   });
 
-  test('Duplicate Account Handling', async () => {
+  test('TC006-S: Duplicate Account Handling', async () => {
     const existingEmail = 'existinguser@example.com'; 
     const userPassword = 'defaultPassword123';
 
@@ -134,7 +134,7 @@ test.describe('Signup Flow E2E Tests', () => {
     expect(duplicateEmailError).toBe(true);
   });
 
-  test('Successful Signup', async () => {
+  test('TC006-S: Successful Signup', async () => {
     const userEmail = `testuser_${Date.now()}@example.com`;
     const userName = userEmail.split('@')[0];
     const userPassword = 'defaultPassword123';
