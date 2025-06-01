@@ -11,6 +11,8 @@ A comprehensive end-to-end testing suite for the Good Budget application using P
 - [Configuration](#configuration)
 - [Running Tests](#running-tests)
 - [CAPTCHA Handling](#captcha-handling)
+- [Docker Support](#docker-support)
+- [Github Actions](#github-actions)
 - [Page Object Model](#page-object-model)
 - [Logging System](#logging-system)
 - [Test Scripts](#test-scripts)
@@ -23,6 +25,8 @@ This project provides automated end-to-end testing for the Good Budget applicati
 
 - **User Registration/Sign-up** flows
 - **User Authentication/Login** processes
+- **Envelope Management** processes
+
 - **Navigation** between different pages
 - **Form validation** and error handling
 - **User onboarding** experiences
@@ -61,29 +65,46 @@ Before running the tests, ensure you have:
 
 4. **Create environment configuration:**
    ```bash
-   cp .env.example .env
+    cp .env.example .env
    ```
 
-   Edit the `.env` file with your test environment URLs and credentials.
+5. **Then edit the .env file to include the following:**
+   ```bash
+    GOODBUDGET_VALID_EMAIL="existinguser@example.com"
+    GOODBUDGET_VALID_PASSWORD="defaultPassword123"
+   ```
+   These credentials are used in login and sign-up tests. Make sure the email corresponds to an existing test user in your environment.
+
 
 ## 📁 Project Structure
 
 good-budget-e2e-tests/
-├── pages/                    # Page Object Model classes
+├── .dockerignore            # Docker build context ignore rules
+├── .DS_Store                # macOS system file (should be gitignored)
+├── .env                     # Environment variables for test config
+├── .gitignore               # Git ignored files and folders
+├── Dockerfile               # Docker build instructions
+├── node_modules/            # Installed npm packages
+├── package-lock.json        # Exact versions of dependencies
+├── package.json             # Project dependencies and scripts
+├── pages/                   # Page Object Model classes
 │   ├── landing.page.ts      # Base landing page
 │   ├── signUp.page.ts       # Sign-up page interactions
 │   ├── login.page.ts        # Login page interactions
 │   └── home.page.ts         # Home page after login
-├── tests/
+├── playwright-report/       # Playwright HTML test reports
+├── playwright.config.ts     # Playwright configuration
+├── README.md                # Project documentation
+├── test-results/            # Output from test runs
+├── tests/                   # Test suite
 │   └── e2e/                 # End-to-end test files
 │       ├── signup.spec.ts   # Sign-up test scenarios
 │       └── login.spec.ts    # Login test scenarios
-├── utils/                   # Utility functions and helpers
-│   ├── logger.util.ts       # Comprehensive logging system
-│   └── captcha.util.ts      # CAPTCHA handling utilities
-├── playwright.config.ts     # Playwright configuration
-├── package.json             # Project dependencies and scripts
-└── README.md                # This file
+├── tsconfig.json            # TypeScript configuration
+└── utils/                   # Utility functions and helpers
+    ├── logger.util.ts       # Logging system
+    └── captcha.util.ts      # CAPTCHA handling utilities
+
 
 ## ⚙️ Configuration
 
@@ -171,6 +192,80 @@ await signUpPage.provideSignUpDetails(email, password, {
   pauseForCaptcha: true,  // Set to false to skip manual pause
   clickGetStarted: false  // Set to false if you handle submission manually
 });
+```
+
+
+## 🐳 Docker Support
+
+You can run the test suite inside a Docker container using the included `Dockerfile`.
+
+### Dockerfile Overview
+
+A `Dockerfile` is provided to containerize the test environment:
+
+```dockerfile
+FROM mcr.microsoft.com/playwright:v1.44.0-jammy
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci
+
+COPY . .
+
+RUN npx playwright install --with-deps
+
+ENV BASE_URL='https://www.goodbudget.com'
+
+CMD ["npm", "test"]
+
+```
+### Build and Run (Manually)
+
+To build and run tests in Docker locally:
+
+``` bash
+docker build -t good-budget-e2e .
+docker run --rm -i good-budget-e2e
+```
+
+
+## CI/CD: GitHub Actions
+
+Automated E2E tests are executed via GitHub Actions on each push to the main branch.
+
+GitHub Workflow: e2e-tests.yml
+The following workflow builds and runs the test suite inside Docker containers:
+
+``` yml
+name: E2E Tests (Docker)
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        run: docker build -t good-budget-e2e ./good-budget-e2e-tests
+
+      - name: Run login tests
+        run: |
+          docker run --rm -i --env DOCKER=true good-budget-e2e npm run test:login
+
+      - name: Run envelope tests
+        run: |
+          docker run --rm -i --env DOCKER=true good-budget-e2e npm run test:envelope
 ```
 
 ## 🏗️ Page Object Model
