@@ -21,10 +21,8 @@ jobs:
 
       - name: Run login tests
         run: |
-          docker run --rm -it --env DOCKER=true good-budget-e2e npm run test:login
+          docker run --rm -i --env DOCKER=true good-budget-e2e npm run test:login
 
       - name: Run envelope tests
         run: |
-          docker run --rm -it --env DOCKER=true good-budget-e2e npm run test:envelope
-
-
+          docker run --rm -i --env DOCKER=true good-budget-e2e npm run test:envelope
