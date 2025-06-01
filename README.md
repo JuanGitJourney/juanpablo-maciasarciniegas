@@ -14,7 +14,7 @@ This repository contains the submission for the Quality Engineer take-home chall
   * It includes the automated checks for three business-critical E2E flows.
   * A `README.md` file within this folder explains the setup, how to run the tests, and the chosen tech stack/approach.
 
-* **`/Task 3 – REST API Test Automation`** *(optional)*:
+* **`/Task 3 – REST API Test Automation`**:
   * Identified internal REST endpoints using browser dev tools.
   * Built an API test suite using a code-based framework.
   * Includes:
