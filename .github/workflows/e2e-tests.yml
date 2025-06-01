@@ -3,6 +3,8 @@ name: E2E Tests (Docker)
 on:
   push:
     branches: [ main ]
+      paths:
+      - 'good-budget-e2e-tests/**'
   workflow_dispatch:
 
 jobs:
