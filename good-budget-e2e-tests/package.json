@@ -4,15 +4,22 @@
   "description": "E2E tests for Good Budget App",
   "scripts": {
     "test": "npx playwright test",
+    "test:login:safari": "npx playwright test ./tests/e2e/login.spec.ts --project=safari",
+    "test:login:chrome": "npx playwright test ./tests/e2e/login.spec.ts --project=chromium",
+    "test:login:firefox": "npx playwright test ./tests/e2e/login.spec.ts --project=firefox",
+    "test:envelope:safari": "npx playwright test ./tests/e2e/envelope.spec.ts --project=safari",
+    "test:envelope:chrome": "npx playwright test ./tests/e2e/envelope.spec.ts --project=chromium",
+    "test:envelope:firefox": "npx playwright test ./tests/e2e/envelope.spec.ts --project=firefox",
+    "test:signup:safari": "npx playwright test ./tests/e2e/signup.spec.ts --project=safari",
+    "test:signup:chrome": "npx playwright test ./tests/e2e/signup.spec.ts --project=chromium",
+    "test:signup:firefox": "npx playwright test ./tests/e2e/signup.spec.ts --project=firefox",
     "test:signup": "npx playwright test ./tests/e2e/signup.spec.ts",
     "test:login": "npx playwright test ./tests/e2e/login.spec.ts",
     "test:envelope": "npx playwright test ./tests/e2e/envelope.spec.ts",
     "test:headed": "npx playwright test --headed",
     "test:ui": "npx playwright test --ui",
     "test:report": "npx playwright show-report",
-    "test:all": "npx playwright test --all",
-    "test:chrome": "npx playwright test --project=chromium",
-    "test:safari": "npx playwright test --project=safari"
+    "test:all": "npx playwright test --all"
   },
   "keywords": [
     "playwright",

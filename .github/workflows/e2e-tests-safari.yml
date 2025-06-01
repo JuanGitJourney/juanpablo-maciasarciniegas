@@ -1,4 +1,4 @@
-name: E2E Tests (Docker)
+name: E2E Tests Safari (Docker)
 
 on:
   push:
@@ -23,8 +23,8 @@ jobs:
 
       - name: Run login tests
         run: |
-          docker run --rm -i --env DOCKER=true good-budget-e2e npm run test:login
+          docker run --rm -i --env DOCKER=true good-budget-e2e npm run test:login:safari
 
       - name: Run envelope tests
         run: |
-          docker run --rm -i --env DOCKER=true good-budget-e2e npm run test:envelope
+          docker run --rm -i --env DOCKER=true good-budget-e2e npm run test:envelope:safari
