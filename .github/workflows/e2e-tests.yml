@@ -4,7 +4,7 @@ on:
   push:
     branches: [ main ]
       paths:
-      - 'good-budget-e2e-tests/**'
+        - 'good-budget-e2e-tests/**'
   workflow_dispatch:
 
 jobs:
