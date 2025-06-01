@@ -17,7 +17,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Build Docker image
-        run: docker build -t good-budget-e2e .
+        run: docker build -t good-budget-e2e ./good-budget-e2e-tests
 
       - name: Run login tests
         run: |
